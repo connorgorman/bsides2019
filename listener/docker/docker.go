@@ -32,6 +32,10 @@ func NewListener() (*Listener, error) {
 	)
 	for _, s := range possibleDockerSockets {
 		dockerClient, err = client.NewClient(s, api.DefaultVersion, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		_, err = dockerClient.Info(context.Background())
 		if err == nil {
 			break
 		}
