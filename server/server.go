@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -26,7 +27,11 @@ func (s *Server) GetRouter() http.Handler {
 }
 
 func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) {
-	log.Printf("Container")
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+	}
+	log.Println(string(data))
 }
 
 func (s *Server) ContainerHandler(w http.ResponseWriter, req *http.Request) {
@@ -34,8 +39,11 @@ func (s *Server) ContainerHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
-	log.Printf("Files")
-
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+	}
+	log.Println(string(data))
 }
 
 func (s *Server) FilesHandler(w http.ResponseWriter, req *http.Request) {
@@ -43,8 +51,11 @@ func (s *Server) FilesHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
-	log.Printf("Capabilities")
-
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+	}
+	log.Println(string(data))
 }
 
 func (s *Server) CapabilitiesHandler(w http.ResponseWriter, req *http.Request) {

@@ -60,7 +60,6 @@ func (l *Listener) parseAndOutput(line string) {
 	cid, ok := l.pidsToContainers[pid]
 	l.lock.Unlock()
 	if !ok {
-		log.Printf("dropping capability: %d - %s", pid, values[4])
 		return
 	}
 

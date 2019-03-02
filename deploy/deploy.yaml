@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - image: connorgorman/bsides2019:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: sensor
         command:
           - /server
@@ -59,7 +59,7 @@ spec:
       - name: listener
         securityContext:
           privileged: true
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         image: connorgorman/bsides2019:latest
         command:
           - /listener
