@@ -30,6 +30,7 @@ func main(){
 		case cap := <-capableListener.Output():
 			log.Printf("Cap: %+v", cap)
 		case pid := <-pidListener.Output():
+			log.Printf("PID: %+v", pid)
 			capableListener.AddContainer(pid)
 		}
 	}
