@@ -19,6 +19,7 @@ spec:
     spec:
       containers:
       - image: connorgorman/bsides2019:latest
+        imagePullPolicy: IfNotPresent
         name: sensor
         command:
           - /server
@@ -47,7 +48,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      service: listener
+      app: listener
   template:
     metadata:
       labels:
@@ -56,6 +57,16 @@ spec:
     spec:
       containers:
       - name: listener
+        securityContext:
+          privileged: true
+        imagePullPolicy: IfNotPresent
         image: connorgorman/bsides2019:latest
         command:
           - /listener
+        volumeMounts:
+        - mountPath: /host
+          name: hostroot
+      volumes:
+      - hostPath:
+          path: /
+        name: hostroot

@@ -25,18 +25,23 @@ func newClient(endpoint string) *client {
 }
 
 func (c *client) SendContainer(container types.Container) {
+	log.Printf("Container: %+v", container)
 	if err := c.sendRequest("/containers", &container); err != nil {
-		log.Printf("error sending capability: %v", err)
+		log.Printf("error sending containers: %v", err)
 	}
 }
 
 func (c *client) SendFile(file types.File) {
+	log.Printf("Files: %+v", file)
+
 	if err := c.sendRequest("/files", &file); err != nil {
-		log.Printf("error sending capability: %v", err)
+		log.Printf("error sending files: %v", err)
 	}
 }
 
 func (c *client) SendCapability(capability types.Capability) {
+	log.Printf("Capability: %+v", capability)
+
 	if err := c.sendRequest("/capabilities", &capability); err != nil {
 		log.Printf("error sending capability: %v", err)
 	}

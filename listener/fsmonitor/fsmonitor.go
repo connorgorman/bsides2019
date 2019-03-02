@@ -37,7 +37,7 @@ type Listener struct {
 	containerIDToContainer map[string]*containerWrapper
 	mergedPathToContainer map[string]*containerWrapper
 
-	output <-chan types.File
+	output chan types.File
 }
 
  func NewListener() (*Listener, error) {
@@ -153,9 +153,10 @@ func (c *Listener) watchFiles() {
 					continue
 				}
 				container.modifiedPaths[relativePath] = struct{}{}
-
-				log.Printf("New modification to %s in container %q (Pod %s)", relativePath, container.Name, container.Pod)
-
+				c.output <- types.File{
+					ContainerID: container.ID,
+					Path: relativePath,
+				}
 			}
 		case err, ok := <-c.watcher.Errors:
 			if !ok {

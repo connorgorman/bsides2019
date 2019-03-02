@@ -14,7 +14,7 @@ import (
 )
 
 type Listener struct {
-	output chan *types.Capability
+	output chan types.Capability
 	pidsToContainers map[int]string
 	containerToCaps map[string]map[string]struct{}
 
@@ -23,13 +23,13 @@ type Listener struct {
 
 func NewListener() *Listener {
 	return &Listener{
-		output: make(chan *types.Capability),
+		output: make(chan types.Capability),
 		pidsToContainers: make(map[int]string),
 		containerToCaps: make(map[string]map[string]struct{}),
 	}
 }
 
-func (l *Listener) Output() <-chan *types.Capability {
+func (l *Listener) Output() <-chan types.Capability {
 	return l.output
 }
 
@@ -67,7 +67,7 @@ func (l *Listener) parseAndOutput(line string) {
 	if _, ok := l.containerToCaps[cid]; !ok {
 		l.containerToCaps[cid] = make(map[string]struct{})
 	}
-	l.output <- &types.Capability{
+	l.output <- types.Capability{
 		ContainerID: cid,
 		PID: pid,
 		Command: values[4],

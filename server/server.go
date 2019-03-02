@@ -15,7 +15,7 @@ func (s *Server) GetRouter() http.Handler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/containers", s.ContainerPostHandler)
-	r.HandleFunc("/containers", s.ContainerHandler)
+	r.HandleFunc("/containers/{id}", s.ContainerHandler)
 
 	r.HandleFunc("/files", s.FilesPostHandler)
 	r.HandleFunc("/files/{id}", s.FilesHandler)
@@ -55,12 +55,11 @@ func (s *Server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
 
 }
 
-
 func main() {
 	var server Server
 	srv := &http.Server{
 		Handler:      server.GetRouter(),
-		Addr:         "127.0.0.1:8080",
+		Addr:         ":8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
