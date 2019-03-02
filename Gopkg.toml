@@ -1,0 +1,19 @@
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+
+ignored = ["github.com/stackrox/demo"]
+
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
+
+[[constraint]]
+  name = "github.com/fsnotify/fsnotify"
+  revision = "ccc981bf80385c528a65fbfdd49bf2d8da22aa23"
+
+[[constraint]]
+  name = "github.com/docker/docker"
+  revision = "7c9e64a2e1891bf1020d9312a18741c734fa1cd6"
+  [metadata]
+  upstream = "17.09-ce plus additional commits to fix Darwin build"
