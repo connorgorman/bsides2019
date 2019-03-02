@@ -21,7 +21,21 @@ type Listener struct {
 }
 
 func NewListener() (*Listener, error) {
-	dockerClient, err := client.NewClient("unix:///host/var/run/docker.sock", api.DefaultVersion, nil, nil)
+	possibleDockerSockets := []string {
+		"unix:///host/var/run/docker.sock",
+		"unix:///host/run/docker.sock",
+	}
+
+	var (
+		dockerClient *client.Client
+		err error
+	)
+	for _, s := range possibleDockerSockets {
+		dockerClient, err = client.NewClient(s, api.DefaultVersion, nil, nil)
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
 		return nil, err
 	}

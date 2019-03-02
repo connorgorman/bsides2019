@@ -15,7 +15,7 @@ func main(){
 	go dockerListener.Start()
 
 	capableListener := capable.NewListener()
-	//go capableListener.Start()
+	go capableListener.Start()
 
 	pidListener := pid.NewListener()
 	go pidListener.Start()
