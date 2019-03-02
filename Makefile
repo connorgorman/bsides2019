@@ -47,19 +47,11 @@ clean-deps:
 ## Build ##
 ###########
 .PHONY: build
-build: build-darwin build-linux
-
-.PHONY: build-darwin
-build-darwin:
-	@echo "+ $@"
-	@mkdir -p build/bin
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ./container/bin/fsmonitor ./fsmonitor
-
-.PHONY: build-linux
-build-linux:
+build:
 	@echo "+ $@"
 	@mkdir -p build/bin
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./container/bin/fsmonitor ./fsmonitor
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./container/bin/capable ./capable
 
 .PHONY: test
 test:
@@ -68,7 +60,7 @@ test:
 ###########
 ## Image ##
 ###########
-image: build-linux
+image: build
 	@echo "+ $@"
 	@mkdir -p container/bin
 	docker build -t connorgorman/bsides2019:latest container/
