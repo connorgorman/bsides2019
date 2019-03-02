@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/stackrox/demo/listener/capable"
-	"github.com/stackrox/demo/listener/docker"
+	"github.com/connorgorman/bsides2019/listener/capable"
+	"github.com/connorgorman/bsides2019/listener/docker"
 	"log"
 )
 

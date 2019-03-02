@@ -11,7 +11,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	demoTypes "github.com/stackrox/demo/types"
+	demoTypes "github.com/connorgorman/bsides2019/types"
 )
 
 type Listener struct {

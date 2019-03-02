@@ -2,7 +2,7 @@ package capable
 
 import (
 	"bufio"
-	"github.com/stackrox/demo/types"
+	"github.com/connorgorman/bsides2019/types"
 	"io"
 	"log"
 	"os/exec"
