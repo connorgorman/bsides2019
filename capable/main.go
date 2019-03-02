@@ -37,7 +37,7 @@ func parseLine(line string) (*Line, error) {
 }
 
 func main() {
-	cmd := exec.Command("/capable-mock.sh")
+	cmd := exec.Command("/usr/share/bcc/tools/capable")
 	stdoutPipe, err := cmd.StdoutPipe()
 	if err != nil {
 		panic(err)
