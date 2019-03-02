@@ -80,7 +80,7 @@ func (c *Listener) AddContainer(container *types.Container) {
 func (c *Listener) AddToWatcher(container *containerWrapper, files ...string) {
 	for _, f := range files {
 		if err := c.watcher.Add(f); err != nil {
-			log.Printf("error adding file %q to watcher", f)
+			log.Printf("error adding file %q to watcher: %v", f, err)
 			continue
 		}
 		container.listeningPaths[f] = struct{}{}
