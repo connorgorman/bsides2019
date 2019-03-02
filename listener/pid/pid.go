@@ -12,6 +12,7 @@ import (
 type ContainerPID struct {
 	ID  string
 	PID int
+	Command string
 }
 
 type Listener struct {
@@ -33,6 +34,12 @@ func (l *Listener) parseCgroupAndOutput(pid int) {
 	if err != nil {
 		return
 	}
+
+	command, err := ioutil.ReadFile(fmt.Sprintf("/host/proc/%d/cmdline", pid))
+	if err != nil {
+		return
+	}
+
 	dataStr := string(data)
 	line := strings.SplitN(dataStr, "\n", 2)[0]
 	lineSplit := strings.Split(line, "/")
@@ -40,7 +47,7 @@ func (l *Listener) parseCgroupAndOutput(pid int) {
 	if len(containerID) != 64 {
 		return
 	}
-	l.pidChan <- ContainerPID{ID: containerID, PID: pid}
+	l.pidChan <- ContainerPID{ID: containerID, PID: pid, Command: string(command)}
 }
 
 func (l *Listener) Start() {
@@ -49,7 +56,6 @@ func (l *Listener) Start() {
 	t := time.NewTicker(10 * time.Millisecond)
 
 	seenPids := make(map[int]struct{})
-
 	for {
 		<-t.C
 		dirs, err := ioutil.ReadDir(path)

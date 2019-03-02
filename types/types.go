@@ -17,13 +17,3 @@ type Container struct {
 	PID int
 	FilePath string
 }
-
-type CapabilityMessage struct {
-	Container Container
-	Capability Capability
-}
-
-type FileMessage struct {
-	Container Container
-	File File
-}

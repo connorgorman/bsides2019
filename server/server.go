@@ -1,28 +1,40 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+	"time"
 )
 
 type Server struct {
 
 }
 
-
-
-func (s *Server) Start() {
+func (s *Server) GetRouter() http.Handler {
 	r := mux.NewRouter()
+
+	r.HandleFunc("/containers", s.ContainerPostHandler)
+	r.HandleFunc("/containers", s.ContainerHandler)
 
 	r.HandleFunc("/files", s.FilesPostHandler)
 	r.HandleFunc("/files/{id}", s.FilesHandler)
 
 	r.HandleFunc("/capabilities/{id}", s.CapabilitiesHandler)
 	r.HandleFunc("/capabilities}", s.CapabilitiesPostHandler)
+	return r
+}
+
+func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) {
+	log.Printf("Container")
+}
+
+func (s *Server) ContainerHandler(w http.ResponseWriter, req *http.Request) {
+
 }
 
 func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
+	log.Printf("Files")
 
 }
 
@@ -31,6 +43,7 @@ func (s *Server) FilesHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
+	log.Printf("Capabilities")
 
 }
 
@@ -44,29 +57,13 @@ func (s *Server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
 
 
 func main() {
-
-	r := mux.NewRouter()
-	s := r.PathPrefix("/products").Subrouter()
-	// "/products/"
-	s.HandleFunc("/", ProductsHandler)
-	// "/products/{key}/"
-	s.HandleFunc("/{key}/", ProductHandler)
-	// "/products/{key}/details"
-	s.HandleFunc("/{key}/details", ProductDetailsHandler)
-
-
-
-
-
-
-
-	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to my website!")
-	})
-
-	fs := http.FileServer(http.Dir("static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	http.ListenAndServe(":80", nil)
+	var server Server
+	srv := &http.Server{
+		Handler:      server.GetRouter(),
+		Addr:         "127.0.0.1:8080",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	log.Fatal(srv.ListenAndServe())
 }
 

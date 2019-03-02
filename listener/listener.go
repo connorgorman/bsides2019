@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/connorgorman/bsides2019/listener/capable"
 	"github.com/connorgorman/bsides2019/listener/docker"
+	"github.com/connorgorman/bsides2019/listener/fsmonitor"
 	"github.com/connorgorman/bsides2019/listener/pid"
-	"log"
 )
 
 func main(){
@@ -15,24 +15,31 @@ func main(){
 	go dockerListener.Start()
 
 	capableListener := capable.NewListener()
-	go capableListener.Start()
+	//go capableListener.Start()
 
 	pidListener := pid.NewListener()
 	go pidListener.Start()
 
+	fileListener, err := fsmonitor.NewListener()
+	if err != nil {
+		panic(err)
+	}
+	go fileListener.Start()
+
+	client := newClient("http://server.bsides:8080")
 	for {
 		select {
 		case container := <-dockerListener.NewContainerChannel():
-			log.Printf("New container add: %+v", container)
-			//capableListener.AddContainer(container)
+			fileListener.AddContainer(&container)
+			client.SendContainer(container)
 		case cid := <-dockerListener.RemoveContainerChannel():
-			log.Printf("Removed %q", cid)
+			fileListener.RemoveContainer(cid)
 		case cap := <-capableListener.Output():
-			log.Printf("Cap: %+v", cap)
+			client.SendCapability(*cap)
 		case pid := <-pidListener.Output():
-			log.Printf("PID: %+v", pid)
 			capableListener.AddContainer(pid)
+		case file := <- fileListener.Output():
+			client.SendFile(file)
 		}
 	}
-
 }

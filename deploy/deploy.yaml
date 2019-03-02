@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: server
+  namespace: bsides
+  labels:
+    app: server
+spec:
+  replicas: 1
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      namespace: bsides
+      labels:
+        app: server
+    spec:
+      containers:
+      - image: connorgorman/bsides2019:latest
+        name: sensor
+        command:
+          - /server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  namespace: bsides
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: server
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    app: listener
+  name: listener
+  namespace: bsides
+spec:
+  selector:
+    matchLabels:
+      service: listener
+  template:
+    metadata:
+      labels:
+        app: listener
+      namespace: bsides
+    spec:
+      containers:
+      - name: listener
+        image: connorgorman/bsides2019:latest
+        command:
+          - /listener

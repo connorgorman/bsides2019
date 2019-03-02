@@ -16,6 +16,7 @@ import (
 type Listener struct {
 	output chan *types.Capability
 	pidsToContainers map[int]string
+	containerToCaps map[string]map[string]struct{}
 
 	lock sync.Mutex
 }
@@ -24,6 +25,7 @@ func NewListener() *Listener {
 	return &Listener{
 		output: make(chan *types.Capability),
 		pidsToContainers: make(map[int]string),
+		containerToCaps: make(map[string]map[string]struct{}),
 	}
 }
 
@@ -52,7 +54,8 @@ func (l *Listener) parseAndOutput(line string) {
 		return
 	}
 
-	time.Sleep(50 * time.Millisecond)
+	// Delay so that pid can be scraped
+	time.Sleep(10 * time.Millisecond)
 	l.lock.Lock()
 	cid, ok := l.pidsToContainers[pid]
 	l.lock.Unlock()
@@ -61,6 +64,9 @@ func (l *Listener) parseAndOutput(line string) {
 		return
 	}
 
+	if _, ok := l.containerToCaps[cid]; !ok {
+		l.containerToCaps[cid] = make(map[string]struct{})
+	}
 	l.output <- &types.Capability{
 		ContainerID: cid,
 		PID: pid,
