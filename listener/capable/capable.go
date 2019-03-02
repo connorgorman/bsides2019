@@ -54,8 +54,8 @@ func (l *Listener) parseAndOutput(line string) {
 
 	time.Sleep(50 * time.Millisecond)
 	l.lock.Lock()
-	defer l.lock.Unlock()
 	cid, ok := l.pidsToContainers[pid]
+	l.lock.Unlock()
 	if !ok {
 		log.Printf("dropping capability: %d - %s", pid, values[4])
 		return
