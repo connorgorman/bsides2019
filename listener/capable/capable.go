@@ -2,6 +2,7 @@ package capable
 
 import (
 	"bufio"
+	"github.com/connorgorman/bsides2019/listener/pid"
 	"github.com/connorgorman/bsides2019/types"
 	"io"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Listener struct {
@@ -29,7 +31,7 @@ func (l *Listener) Output() <-chan *types.Capability {
 	return l.output
 }
 
-func (l *Listener) AddContainer(c types.Container) {
+func (l *Listener) AddContainer(c pid.ContainerPID) {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	l.pidsToContainers[c.PID] = c.ID
@@ -50,6 +52,7 @@ func (l *Listener) parseAndOutput(line string) {
 		return
 	}
 
+	time.Sleep(50 * time.Millisecond)
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	cid, ok := l.pidsToContainers[pid]

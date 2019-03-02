@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/connorgorman/bsides2019/listener/capable"
 	"github.com/connorgorman/bsides2019/listener/docker"
+	"github.com/connorgorman/bsides2019/listener/pid"
 	"log"
 )
 
@@ -14,16 +15,21 @@ func main(){
 	go dockerListener.Start()
 
 	capableListener := capable.NewListener()
-	go capableListener.Start()
+	//go capableListener.Start()
+
+	pidListener := pid.NewListener()
+	go pidListener.Start()
 
 	for {
 		select {
 		case container := <-dockerListener.NewContainerChannel():
-			capableListener.AddContainer(container)
+			//capableListener.AddContainer(container)
 		case cid := <-dockerListener.RemoveContainerChannel():
 			log.Printf("Removed %q", cid)
 		case cap := <-capableListener.Output():
 			log.Printf("Cap: %+v", cap)
+		case pid := <-pidListener.Output():
+			capableListener.AddContainer(pid)
 		}
 	}
 

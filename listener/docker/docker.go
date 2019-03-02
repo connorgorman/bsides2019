@@ -21,7 +21,7 @@ type Listener struct {
 }
 
 func NewListener() (*Listener, error) {
-	dockerClient, err := client.NewClient("unix:///host/run/docker.sock", api.DefaultVersion, nil, nil)
+	dockerClient, err := client.NewClient("unix:///host/var/run/docker.sock", api.DefaultVersion, nil, nil)
 	if err != nil {
 		return nil, err
 	}
