@@ -23,6 +23,7 @@ func main(){
 	for {
 		select {
 		case container := <-dockerListener.NewContainerChannel():
+			log.Printf("New container add: %+v", container)
 			//capableListener.AddContainer(container)
 		case cid := <-dockerListener.RemoveContainerChannel():
 			log.Printf("Removed %q", cid)
