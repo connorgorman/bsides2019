@@ -33,20 +33,19 @@ func main() {
 		select {
 		case container := <-dockerListener.NewContainerChannel():
 			fileListener.AddContainer(&container)
-			client.SendContainer(container)
+			go client.SendContainer(container)
 
 		case cid := <-dockerListener.RemoveContainerChannel():
 			fileListener.RemoveContainer(cid)
 
 		case cap := <-capableListener.Output():
 			log.Printf("Capability: %+v", cap)
-			client.SendCapability(cap)
+			go client.SendCapability(cap)
 
 		case pid := <-pidListener.Output():
 			capableListener.AddContainer(pid)
-
 		case file := <-fileListener.Output():
-			client.SendFile(file)
+			go client.SendFile(file)
 		}
 	}
 }
