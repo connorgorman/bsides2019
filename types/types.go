@@ -12,10 +12,10 @@ type File struct {
 }
 
 type Container struct {
-	ID, Name, Pod string
-	PID           int
-	FilePath      string
-	ReadonlyFS    bool
+	ID, Name, Pod, Namespace string
+	PID                      int
+	FilePath                 string
+	ReadonlyFS               bool
 }
 
 type ContainerPID struct {
@@ -24,8 +24,8 @@ type ContainerPID struct {
 }
 
 type Network struct {
-	PID int
+	PID                   int
 	Command, SAddr, DAddr string
-	DPort int
-	Call string
+	DPort                 int
+	Call                  string
 }

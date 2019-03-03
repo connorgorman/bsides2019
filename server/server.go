@@ -18,6 +18,7 @@ type server struct {
 	containerToPidMap   map[string][]*types.ContainerPID
 	containerToFilesMap map[string][]string
 	pidsToCaps          map[int][]*types.Capability
+	pidsToNetwork       map[int][]*types.Network
 
 	lock sync.Mutex
 }
@@ -27,7 +28,9 @@ func newServer() *server {
 		containerMap:        make(map[string]*types.Container),
 		containerToPidMap:   make(map[string][]*types.ContainerPID),
 		containerToFilesMap: make(map[string][]string),
-		pidsToCaps:          make(map[int][]*types.Capability),
+
+		pidsToCaps:    make(map[int][]*types.Capability),
+		pidsToNetwork: make(map[int][]*types.Network),
 	}
 }
 
@@ -41,6 +44,7 @@ type ContainerResponse struct {
 	Container            *types.Container    `json:",omitempty"`
 	CapabilitiesRequired []*types.Capability `json:",omitempty"`
 	File                 FileResponse        `json:",omitempty"`
+	Network              []*types.Network    `json:",omitempty"`
 }
 
 func (s *server) GetRouter() http.Handler {
@@ -73,8 +77,13 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 		if !strings.HasPrefix(container.Name, namePrefix) {
 			continue
 		}
+		// For the sake of the demo, ignore kube-system
+		if container.Namespace == "kube-system" {
+			continue
+		}
 		pids := s.containerToPidMap[cid]
 		var capabilities []*types.Capability
+		var network []*types.Network
 
 		seenCap := make(map[capabilityKey]struct{})
 		for _, p := range pids {
@@ -85,6 +94,8 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 				seenCap[capabilityKey{command: c.Command, cap: c.Cap}] = struct{}{}
 				capabilities = append(capabilities, c)
 			}
+
+			network = append(network, s.pidsToNetwork[p.PID]...)
 		}
 
 		roots, possible := GetRootPaths(s.containerToFilesMap[cid])
@@ -96,6 +107,7 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 				ReadOnlyPossible: possible,
 				IsReadOnly:       container.ReadonlyFS,
 			},
+			Network: network,
 		})
 	}
 
@@ -182,7 +194,14 @@ func (s *server) NetworkPostHandler(w http.ResponseWriter, req *http.Request) {
 		log.Printf("Error reading body: %v", err)
 		return
 	}
-	log.Printf("Network %s", string(data))
+	var network types.Network
+	if err := json.Unmarshal(data, &network); err != nil {
+		log.Printf("error unmarshalling network: %v", err)
+		return
+	}
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.pidsToNetwork[network.PID] = append(s.pidsToNetwork[network.PID], &network)
 }
 
 func main() {

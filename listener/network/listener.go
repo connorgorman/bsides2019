@@ -1,20 +1,20 @@
 package network
 
 import (
-"bufio"
+	"bufio"
 	"fmt"
 	"io"
-"log"
-"os/exec"
-"strconv"
-"strings"
-"sync"
+	"log"
+	"os/exec"
+	"strconv"
+	"strings"
+	"sync"
 
-"github.com/connorgorman/bsides2019/types"
+	"github.com/connorgorman/bsides2019/types"
 )
 
 type Listener struct {
-	output    chan types.Network
+	output chan types.Network
 
 	networkCalls map[networkKey]struct{}
 
@@ -23,7 +23,7 @@ type Listener struct {
 
 func NewListener() *Listener {
 	return &Listener{
-		output:    make(chan types.Network),
+		output: make(chan types.Network),
 
 		networkCalls: make(map[networkKey]struct{}),
 	}
@@ -35,15 +35,15 @@ func (l *Listener) Output() <-chan types.Network {
 
 type networkKey struct {
 	Command, SAddr, DAddr string
-	DPort int
+	DPort                 int
 }
 
 func networkKeyFromNetwork(n types.Network) networkKey {
 	return networkKey{
 		Command: n.Command,
-		SAddr: n.SAddr,
-		DAddr: n.DAddr,
-		DPort: n.DPort,
+		SAddr:   n.SAddr,
+		DAddr:   n.DAddr,
+		DPort:   n.DPort,
 	}
 }
 
@@ -66,12 +66,12 @@ func (l *Listener) parseAndOutput(line string, call string) {
 	}
 
 	nc := types.Network{
-		PID: pid,
+		PID:     pid,
 		Command: values[1],
-		SAddr: values[3],
-		DAddr: values[4],
-		DPort: port,
-		Call: call,
+		SAddr:   values[3],
+		DAddr:   values[4],
+		DPort:   port,
+		Call:    call,
 	}
 
 	mapKey := networkKeyFromNetwork(nc)

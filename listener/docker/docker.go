@@ -75,9 +75,10 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 	}
 
 	d.newContainerChannel <- demoTypes.Container{
-		ID:   containerJSON.ID,
-		Name: containerJSON.Config.Labels["io.kubernetes.container.name"],
-		Pod:  containerJSON.Config.Labels["io.kubernetes.pod.name"],
+		ID:        containerJSON.ID,
+		Name:      containerJSON.Config.Labels["io.kubernetes.container.name"],
+		Pod:       containerJSON.Config.Labels["io.kubernetes.pod.name"],
+		Namespace: containerJSON.Config.Labels["io.kubernetes.pod.namespace"],
 
 		PID:        containerJSON.State.Pid,
 		FilePath:   filepath.Join("/host/", path),
