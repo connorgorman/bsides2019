@@ -33,8 +33,8 @@ func newServer() *server {
 
 type FileResponse struct {
 	PotentialFSRoots []string `json:",omitempty"`
-	ReadOnlyPossible bool     `json:",omitempty"`
-	IsReadOnly       bool     `json:",omitempty"`
+	ReadOnlyPossible bool
+	IsReadOnly       bool
 }
 
 type ContainerResponse struct {
