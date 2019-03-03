@@ -56,7 +56,7 @@ func (l *Listener) parseAndOutput(line string) {
 	}
 
 	// Delay so that pid can be scraped
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	l.lock.Lock()
 	cid, ok := l.pidsToContainers[pid]
 	l.lock.Unlock()
