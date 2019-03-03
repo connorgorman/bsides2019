@@ -16,7 +16,7 @@ spec:
         app: ubuntu
     spec:
       containers:
-      - image: ubuntu:18.04
+      - image: connorgorman/bsides2019:latest
         imagePullPolicy: Always
         name: ubuntu
         command: ["sleep", "10000"]
