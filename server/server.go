@@ -13,8 +13,8 @@ import (
 )
 
 type Server struct {
-	containerMap map[string]*types.Container
-	containerToPidMap map[string][]*types.ContainerPID
+	containerMap        map[string]*types.Container
+	containerToPidMap   map[string][]*types.ContainerPID
 	containerToFilesMap map[string][]string
 	pidsToCaps          map[int][]*types.Capability
 
@@ -27,9 +27,9 @@ type FileResponse struct {
 }
 
 type ContainerResponse struct {
-	Container *types.Container
+	Container            *types.Container
 	CapabilitiesRequired []*types.Capability
-	File FileResponse
+	File                 FileResponse
 }
 
 func (s *Server) GetRouter() http.Handler {
@@ -48,7 +48,6 @@ func (s *Server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 	defer s.lock.Unlock()
 
 	containerResponses := make([]ContainerResponse, 0, len(s.containerMap))
-
 	for cid, container := range s.containerMap {
 		pids := s.containerToPidMap[cid]
 		var capabilities []*types.Capability
@@ -58,7 +57,7 @@ func (s *Server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 
 		roots, possible := s.containerToFilesMap[cid]
 		containerResponses = append(containerResponses, ContainerResponse{
-			Container: container,
+			Container:            container,
 			CapabilitiesRequired: capabilities,
 			File: FileResponse{
 				PotentialFSRoots: roots,
@@ -78,43 +77,68 @@ func (s *Server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 	}
-	log.Println(string(data))
+
+	var container types.Container
+	if err := json.Unmarshal(data, &container); err != nil {
+		log.Printf("error unmarshalling container: %v", err)
+		return
+	}
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	s.containerMap[container.ID] = &container
 }
 
 func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 	}
-	log.Println(string(data))
+
+	var file types.File
+	if err := json.Unmarshal(data, &file); err != nil {
+		log.Printf("error unmarshalling file: %v", err)
+		return
+	}
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	s.containerToFilesMap[file.ContainerID] = append(s.containerToFilesMap[file.ContainerID], file.Path)
 }
 
 func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 	}
-	log.Println(string(data))
+
+	var capability types.Capability
+	if err := json.Unmarshal(data, &capability); err != nil {
+		log.Printf("error unmarshalling capability: %v", err)
+		return
+	}
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	s.pidsToCaps[capability.PID] = append(s.pidsToCaps[capability.PID], &capability)
 }
 
 func (s *Server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
+		return
 	}
-	log.Println(string(data))
+	var pid types.ContainerPID
+	if err := json.Unmarshal(data, &pid); err != nil {
+		log.Printf("error unmarshalling pid: %v", err)
+		return
+	}
+
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	s.containerToPidMap[pid.ID] = append(s.containerToPidMap[pid.ID], &pid)
 }
 
 func (s *Server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
