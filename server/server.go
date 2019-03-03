@@ -18,7 +18,7 @@ type server struct {
 	containerToFilesMap map[string][]string
 	pidsToCaps          map[int][]*types.Capability
 
-	lock sync.RWMutex
+	lock sync.Mutex
 }
 
 func newServer() *server {
@@ -96,8 +96,8 @@ func (s *server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) 
 		log.Printf("error unmarshalling container: %v", err)
 		return
 	}
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.containerMap[container.ID] = &container
 }
 
@@ -112,8 +112,8 @@ func (s *server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 		log.Printf("error unmarshalling file: %v", err)
 		return
 	}
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.containerToFilesMap[file.ContainerID] = append(s.containerToFilesMap[file.ContainerID], file.Path)
 }
 
@@ -128,8 +128,8 @@ func (s *server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Reques
 		log.Printf("error unmarshalling capability: %v", err)
 		return
 	}
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.pidsToCaps[capability.PID] = append(s.pidsToCaps[capability.PID], &capability)
 }
 
@@ -145,8 +145,8 @@ func (s *server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	s.containerToPidMap[pid.ID] = append(s.containerToPidMap[pid.ID], &pid)
 }
 
