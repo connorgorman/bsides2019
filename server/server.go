@@ -22,7 +22,7 @@ func (s *Server) GetRouter() http.Handler {
 	r.HandleFunc("/files/{id}", s.FilesHandler)
 
 	r.HandleFunc("/capabilities/{id}", s.CapabilitiesHandler)
-	r.HandleFunc("/capabilities}", s.CapabilitiesPostHandler)
+	r.HandleFunc("/capabilities", s.CapabilitiesPostHandler)
 	return r
 }
 
