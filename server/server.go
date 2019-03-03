@@ -107,6 +107,7 @@ func (s *server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) 
 		log.Printf("error unmarshalling container: %v", err)
 		return
 	}
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.containerMap[container.ID] = &container
@@ -125,7 +126,6 @@ func (s *server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	log.Printf("File Map: %+v", s.containerToFilesMap)
 	s.containerToFilesMap[file.ContainerID] = append(s.containerToFilesMap[file.ContainerID], file.Path)
 }
 
@@ -140,6 +140,8 @@ func (s *server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Reques
 		log.Printf("error unmarshalling capability: %v", err)
 		return
 	}
+	log.Printf("%d - %s - %s", capability.PID, capability.Command, capability.Cap)
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.pidsToCaps[capability.PID] = append(s.pidsToCaps[capability.PID], &capability)
