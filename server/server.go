@@ -116,6 +116,7 @@ func (s *server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	s.lock.Lock()
 	defer s.lock.Unlock()
+	log.Printf("File Map: %+v", s.containerToFilesMap)
 	s.containerToFilesMap[file.ContainerID] = append(s.containerToFilesMap[file.ContainerID], file.Path)
 }
 
