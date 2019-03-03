@@ -56,6 +56,10 @@ func (s *server) GetRouter() http.Handler {
 	return r
 }
 
+type capabilityKey struct {
+	cap, command string
+}
+
 func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	namePrefix := vars["name"]
@@ -70,8 +74,16 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		pids := s.containerToPidMap[cid]
 		var capabilities []*types.Capability
+
+		seenCap := make(map[capabilityKey]struct{})
 		for _, p := range pids {
-			capabilities = append(capabilities, s.pidsToCaps[p.PID]...)
+			for _, c := range s.pidsToCaps[p.PID] {
+				if _, ok := seenCap[capabilityKey{command: c.Command, cap: c.Cap}]; ok {
+					continue
+				}
+				seenCap[capabilityKey{command: c.Command, cap: c.Cap}] = struct{}{}
+				capabilities = append(capabilities, c)
+			}
 		}
 
 		roots, possible := GetRootPaths(s.containerToFilesMap[cid])
@@ -140,7 +152,6 @@ func (s *server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Reques
 		log.Printf("error unmarshalling capability: %v", err)
 		return
 	}
-	log.Printf("%d - %s - %s", capability.PID, capability.Command, capability.Cap)
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -165,7 +176,12 @@ func (s *server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
-
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+		return
+	}
+	log.Printf("Network %s", string(data))
 }
 
 func main() {

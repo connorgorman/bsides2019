@@ -22,3 +22,10 @@ type ContainerPID struct {
 	ID  string
 	PID int
 }
+
+type Network struct {
+	PID int
+	Command, SAddr, DAddr string
+	DPort int
+	Call string
+}

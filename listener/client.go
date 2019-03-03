@@ -49,6 +49,12 @@ func (c *client) SendPID(pid types.ContainerPID) {
 	}
 }
 
+func (c *client) SendNetwork(net types.Network) {
+	if err := c.sendRequest("/network", &net); err != nil {
+		log.Printf("error sending network: %v", err)
+	}
+}
+
 func (c *client) sendRequest(url string, i interface{}) error {
 	data, err := json.Marshal(i)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"github.com/connorgorman/bsides2019/listener/capable"
 	"github.com/connorgorman/bsides2019/listener/docker"
 	"github.com/connorgorman/bsides2019/listener/fsmonitor"
+	"github.com/connorgorman/bsides2019/listener/network"
 	"github.com/connorgorman/bsides2019/listener/pid"
 )
 
@@ -26,6 +27,9 @@ func main() {
 	}
 	go fileListener.Start()
 
+	netListener := network.NewListener()
+	go netListener.Start()
+
 	client := newClient("http://server.bsides:8080")
 	for {
 		select {
@@ -40,6 +44,8 @@ func main() {
 			go client.SendPID(pid)
 		case file := <-fileListener.Output():
 			go client.SendFile(file)
+		case network := <-netListener.Output():
+			go client.SendNetwork(network)
 		}
 	}
 }
