@@ -2,23 +2,32 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/connorgorman/bsides2019/types"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/connorgorman/bsides2019/types"
 	"github.com/gorilla/mux"
 )
 
-type Server struct {
+type server struct {
 	containerMap        map[string]*types.Container
 	containerToPidMap   map[string][]*types.ContainerPID
 	containerToFilesMap map[string][]string
 	pidsToCaps          map[int][]*types.Capability
 
 	lock sync.RWMutex
+}
+
+func newServer() *server {
+	return &server{
+		containerMap:        make(map[string]*types.Container),
+		containerToPidMap:   make(map[string][]*types.ContainerPID),
+		containerToFilesMap: make(map[string][]string),
+		pidsToCaps:          make(map[int][]*types.Capability),
+	}
 }
 
 type FileResponse struct {
@@ -32,7 +41,7 @@ type ContainerResponse struct {
 	File                 FileResponse
 }
 
-func (s *Server) GetRouter() http.Handler {
+func (s *server) GetRouter() http.Handler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/containers", s.ContainerPostHandler).Methods("POST")
@@ -43,7 +52,7 @@ func (s *Server) GetRouter() http.Handler {
 	return r
 }
 
-func (s *Server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -76,7 +85,7 @@ func (s *Server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -92,7 +101,7 @@ func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) 
 	s.containerMap[container.ID] = &container
 }
 
-func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -108,7 +117,7 @@ func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 	s.containerToFilesMap[file.ContainerID] = append(s.containerToFilesMap[file.ContainerID], file.Path)
 }
 
-func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -124,7 +133,7 @@ func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Reques
 	s.pidsToCaps[capability.PID] = append(s.pidsToCaps[capability.PID], &capability)
 }
 
-func (s *Server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -141,12 +150,12 @@ func (s *Server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
 	s.containerToPidMap[pid.ID] = append(s.containerToPidMap[pid.ID], &pid)
 }
 
-func (s *Server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
 
 }
 
 func main() {
-	var server Server
+	server := newServer()
 	srv := &http.Server{
 		Handler:      server.GetRouter(),
 		Addr:         ":8080",
