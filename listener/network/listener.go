@@ -75,10 +75,13 @@ func (l *Listener) parseAndOutput(line string, call string) {
 	}
 
 	mapKey := networkKeyFromNetwork(nc)
+	l.lock.Lock()
 	if _, ok := l.networkCalls[mapKey]; ok {
+		l.lock.Unlock()
 		return
 	}
 	l.networkCalls[mapKey] = struct{}{}
+	l.lock.Unlock()
 
 	l.output <- nc
 }
