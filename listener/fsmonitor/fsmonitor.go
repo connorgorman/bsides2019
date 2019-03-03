@@ -85,7 +85,7 @@ func (c *Listener) AddContainer(container *types.Container) {
 		log.Printf("Error: %v", err)
 		return
 	}
-	var fullpaths []string
+	fullpaths := []string{wrap.FilePath}
 	for _, d := range dirs {
 		if _, ok := pathsToIgnore[d.Name()]; ok {
 			continue
