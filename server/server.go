@@ -65,7 +65,7 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 			capabilities = append(capabilities, s.pidsToCaps[p.PID]...)
 		}
 
-		roots, possible := s.containerToFilesMap[cid]
+		roots, possible := GetRootPaths(s.containerToFilesMap[cid])
 		containerResponses = append(containerResponses, ContainerResponse{
 			Container:            container,
 			CapabilitiesRequired: capabilities,
