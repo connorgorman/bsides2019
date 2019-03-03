@@ -115,7 +115,6 @@ func getSubDirs(path string) []string {
 		if !f.IsDir() {
 			continue
 		}
-		log.Printf("Path: %s", path)
 		if _, ok := pathsToIgnore[f.Name()]; ok {
 			continue
 		}
