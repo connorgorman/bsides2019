@@ -74,15 +74,15 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 		return fmt.Errorf("could not find MergedDir for containerJSON %q", id)
 	}
 
-	pod := containerJSON.Config.Labels["io.kubernetes.pod.name"]
+	containerName := containerJSON.Config.Labels["io.kubernetes.container.name"]
 	// Ignore the pause containers
-	if pod == "POD" {
+	if containerName == "POD" {
 		return nil
 	}
 
 	d.newContainerChannel <- demoTypes.Container{
 		ID:        containerJSON.ID,
-		Name:      containerJSON.Config.Labels["io.kubernetes.container.name"],
+		Name:      containerName,
 		Pod:       containerJSON.Config.Labels["io.kubernetes.pod.name"],
 		Namespace: containerJSON.Config.Labels["io.kubernetes.pod.namespace"],
 

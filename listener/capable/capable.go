@@ -50,7 +50,7 @@ func (l *Listener) parseAndOutput(line string) {
 	}
 
 	cmd := values[4]
-	if strings.HasPrefix("runc", cmd) {
+	if strings.HasPrefix(cmd, "runc") {
 		return
 	}
 
