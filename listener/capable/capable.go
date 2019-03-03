@@ -35,6 +35,7 @@ func (l *Listener) Output() <-chan types.Capability {
 }
 
 func (l *Listener) AddContainer(c pid.ContainerPID) {
+	log.Printf("Container: %+v", c)
 	l.lock.Lock()
 	defer l.lock.Unlock()
 	l.pidsToContainers[c.PID] = c.ID
