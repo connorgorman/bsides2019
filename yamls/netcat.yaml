@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: netcat
+  labels:
+    app: netcat
+spec:
+  replicas: 1
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      app: netcat
+  template:
+    metadata:
+      labels:
+        app: netcat
+    spec:
+      containers:
+      - image: connorgorman/bsides2019:latest
+        imagePullPolicy: Always
+        name: netcat
+        command: ["netcat", "-l", "8080"]
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_RAW
