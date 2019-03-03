@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -46,19 +47,27 @@ func (s *server) GetRouter() http.Handler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/containers", s.ContainerPostHandler).Methods("POST")
+	r.HandleFunc("/containers", s.ContainerGetHandler).Methods("GET")
+	r.HandleFunc("/containers/{name}", s.ContainerGetHandler).Methods("GET")
+
 	r.HandleFunc("/files", s.FilesPostHandler)
 	r.HandleFunc("/capabilities", s.CapabilitiesPostHandler)
 	r.HandleFunc("/pids", s.PIDsPostHandler)
-	r.HandleFunc("/containers", s.ContainerGetHandler).Methods("GET")
 	return r
 }
 
 func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	namePrefix := vars["name"]
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	containerResponses := make([]ContainerResponse, 0, len(s.containerMap))
 	for cid, container := range s.containerMap {
+		if !strings.HasPrefix(container.Name, namePrefix) {
+			continue
+		}
 		pids := s.containerToPidMap[cid]
 		var capabilities []*types.Capability
 		for _, p := range pids {
