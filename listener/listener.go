@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+
 	"github.com/connorgorman/bsides2019/listener/capable"
 	"github.com/connorgorman/bsides2019/listener/docker"
 	"github.com/connorgorman/bsides2019/listener/fsmonitor"
 	"github.com/connorgorman/bsides2019/listener/pid"
-	"log"
 )
 
 func main() {
