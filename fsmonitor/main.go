@@ -16,30 +16,30 @@ import (
 )
 
 var pathsToIgnore = map[string]struct{}{
-	"proc":{},
-	"dev":{},
+	"proc": {},
+	"dev":  {},
 }
 
 var pathLength = 0
 
 type Container struct {
 	ID, Name, Pod string
-	PID int
+	PID           int
 
-	modifiedPaths map[string]struct{}
+	modifiedPaths  map[string]struct{}
 	listeningPaths map[string]struct{}
 }
 
 type ContainerManager struct {
-	client *client.Client
+	client  *client.Client
 	watcher *fsnotify.Watcher
 
 	containerIDToContainer map[string]*Container
-	mergedPathToContainer map[string]*Container
+	mergedPathToContainer  map[string]*Container
 }
 
 func (c *ContainerManager) Start() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	containers, err := c.client.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {
@@ -102,13 +102,13 @@ func (c *ContainerManager) getContainerAndAddToWatcher(id string) error {
 
 	filesystemPathInContainer := filepath.Join("/host/", path)
 	container := &Container{
-		ID: containerJSON.ID,
+		ID:   containerJSON.ID,
 		Name: containerJSON.Config.Labels["io.kubernetes.container.name"],
-		Pod: containerJSON.Config.Labels["io.kubernetes.pod.name"],
+		Pod:  containerJSON.Config.Labels["io.kubernetes.pod.name"],
 
 		PID: containerJSON.State.Pid,
 
-		modifiedPaths: make(map[string]struct{}),
+		modifiedPaths:  make(map[string]struct{}),
 		listeningPaths: make(map[string]struct{}),
 	}
 	c.containerIDToContainer[container.ID] = container
@@ -236,10 +236,10 @@ func main() {
 
 	cm := ContainerManager{
 		watcher: watcher,
-		client: dockerClient,
+		client:  dockerClient,
 
 		containerIDToContainer: make(map[string]*Container),
-		mergedPathToContainer: make(map[string]*Container),
+		mergedPathToContainer:  make(map[string]*Container),
 	}
 
 	if err := cm.Start(); err != nil {

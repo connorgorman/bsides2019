@@ -2,8 +2,6 @@ package capable
 
 import (
 	"bufio"
-	"github.com/connorgorman/bsides2019/listener/pid"
-	"github.com/connorgorman/bsides2019/types"
 	"io"
 	"log"
 	"os/exec"
@@ -11,21 +9,24 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/connorgorman/bsides2019/listener/pid"
+	"github.com/connorgorman/bsides2019/types"
 )
 
 type Listener struct {
-	output chan types.Capability
+	output           chan types.Capability
 	pidsToContainers map[int]string
-	containerToCaps map[string]map[string]struct{}
+	containerToCaps  map[string]map[string]struct{}
 
 	lock sync.Mutex
 }
 
 func NewListener() *Listener {
 	return &Listener{
-		output: make(chan types.Capability),
+		output:           make(chan types.Capability),
 		pidsToContainers: make(map[int]string),
-		containerToCaps: make(map[string]map[string]struct{}),
+		containerToCaps:  make(map[string]map[string]struct{}),
 	}
 }
 
@@ -68,9 +69,9 @@ func (l *Listener) parseAndOutput(line string) {
 	}
 	l.output <- types.Capability{
 		ContainerID: cid,
-		PID: pid,
-		Command: values[4],
-		Cap: values[6],
+		PID:         pid,
+		Command:     values[4],
+		Cap:         values[6],
 	}
 }
 

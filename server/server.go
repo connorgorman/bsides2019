@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
-
 }
 
 func (s *Server) GetRouter() http.Handler {
@@ -76,4 +76,3 @@ func main() {
 	}
 	log.Fatal(srv.ListenAndServe())
 }
-

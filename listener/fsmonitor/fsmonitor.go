@@ -1,16 +1,22 @@
 package fsmonitor
 
 import (
+	"io/ioutil"
+	"log"
+	"path/filepath"
+
 	"github.com/connorgorman/bsides2019/types"
 	"github.com/fsnotify/fsnotify"
-	"log"
-	"os"
-	"path/filepath"
 )
 
 var pathsToIgnore = map[string]struct{}{
-	"proc":{},
-	"dev":{},
+	"proc":  {},
+	"dev":   {},
+	"usr":   {},
+	"boot":  {},
+	"lib":   {},
+	"lib64": {},
+	"sys":   {},
 }
 
 var pathLength = 0
@@ -18,7 +24,7 @@ var pathLength = 0
 type containerWrapper struct {
 	*types.Container
 
-	modifiedPaths map[string]struct{}
+	modifiedPaths  map[string]struct{}
 	listeningPaths map[string]struct{}
 }
 
@@ -26,7 +32,7 @@ func newContainerWrapper(c *types.Container) *containerWrapper {
 	return &containerWrapper{
 		Container: c,
 
-		modifiedPaths: make(map[string]struct{}),
+		modifiedPaths:  make(map[string]struct{}),
 		listeningPaths: make(map[string]struct{}),
 	}
 }
@@ -35,25 +41,25 @@ type Listener struct {
 	watcher *fsnotify.Watcher
 
 	containerIDToContainer map[string]*containerWrapper
-	mergedPathToContainer map[string]*containerWrapper
+	mergedPathToContainer  map[string]*containerWrapper
 
 	output chan types.File
 }
 
- func NewListener() (*Listener, error) {
-	 watcher, err := fsnotify.NewWatcher()
-	 if err != nil {
-	 	return nil, err
-	 }
+func NewListener() (*Listener, error) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return nil, err
+	}
 	return &Listener{
 		watcher: watcher,
 
 		containerIDToContainer: make(map[string]*containerWrapper),
-		mergedPathToContainer: make(map[string]*containerWrapper),
+		mergedPathToContainer:  make(map[string]*containerWrapper),
 
 		output: make(chan types.File),
 	}, nil
- }
+}
 
 func (c *Listener) Start() {
 	c.watchFiles()
@@ -73,8 +79,20 @@ func (c *Listener) AddContainer(container *types.Container) {
 		pathLength = len(wrap.FilePath)
 	}
 	c.mergedPathToContainer[wrap.FilePath] = wrap
-	dirs := getAllSubDirectories(wrap.FilePath)
-	c.AddToWatcher(wrap, dirs...)
+
+	dirs, err := ioutil.ReadDir(wrap.FilePath)
+	if err != nil {
+		log.Printf("Error: %v", err)
+		return
+	}
+	var fullpaths []string
+	for _, d := range dirs {
+		if _, ok := pathsToIgnore[d.Name()]; ok {
+			continue
+		}
+		fullpaths = append(fullpaths, getSubDirs(filepath.Join(wrap.FilePath, d.Name()))...)
+	}
+	c.AddToWatcher(wrap, fullpaths...)
 }
 
 func (c *Listener) AddToWatcher(container *containerWrapper, files ...string) {
@@ -87,23 +105,21 @@ func (c *Listener) AddToWatcher(container *containerWrapper, files ...string) {
 	}
 }
 
-func getAllSubDirectories(dir string) []string {
-	var dirs []string
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			return nil
-		}
-		if _, ok := pathsToIgnore[info.Name()]; ok {
-			return nil
-		}
-		dirs = append(dirs, path)
-		return nil
-	})
+func getSubDirs(path string) []string {
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Printf("Error getting subdirectories for subdir: %v", err)
+		return nil
+	}
+	dirs := []string{path}
+	for _, f := range files {
+		if !f.IsDir() {
+			continue
+		}
+		log.Printf("Path: %s", path)
+		if _, ok := pathsToIgnore[f.Name()]; ok {
+			continue
+		}
+		dirs = append(dirs, getSubDirs(filepath.Join(path, f.Name()))...)
 	}
 	return dirs
 }
@@ -141,7 +157,7 @@ func (c *Listener) watchFiles() {
 					log.Printf("Couldn't find container for merged path %q", mergedPath)
 					continue
 				}
-				c.AddToWatcher(container, getAllSubDirectories(event.Name)...)
+				c.AddToWatcher(container, getSubDirs(event.Name)...)
 			case event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Chmod == fsnotify.Chmod:
 				mergedPath, relativePath := getPathsFromFullMergedPath(event.Name)
 				container, ok := c.mergedPathToContainer[mergedPath]
@@ -155,7 +171,7 @@ func (c *Listener) watchFiles() {
 				container.modifiedPaths[relativePath] = struct{}{}
 				c.output <- types.File{
 					ContainerID: container.ID,
-					Path: relativePath,
+					Path:        relativePath,
 				}
 			}
 		case err, ok := <-c.watcher.Errors:

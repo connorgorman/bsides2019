@@ -7,7 +7,7 @@ import (
 	"github.com/connorgorman/bsides2019/listener/pid"
 )
 
-func main(){
+func main() {
 	dockerListener, err := docker.NewListener()
 	if err != nil {
 		panic(err)
@@ -15,7 +15,7 @@ func main(){
 	go dockerListener.Start()
 
 	capableListener := capable.NewListener()
-	go capableListener.Start()
+	//go capableListener.Start()
 
 	pidListener := pid.NewListener()
 	go pidListener.Start()
@@ -42,7 +42,7 @@ func main(){
 		case pid := <-pidListener.Output():
 			capableListener.AddContainer(pid)
 
-		case file := <- fileListener.Output():
+		case file := <-fileListener.Output():
 			client.SendFile(file)
 		}
 	}

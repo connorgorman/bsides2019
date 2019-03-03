@@ -11,7 +11,7 @@ import (
 )
 
 type Line struct {
-	pid int
+	pid          int
 	cap, command string
 }
 
@@ -30,9 +30,9 @@ func parseLine(line string) (*Line, error) {
 		return nil, err
 	}
 	return &Line{
-		pid: pid,
+		pid:     pid,
 		command: values[4],
-		cap: values[6],
+		cap:     values[6],
 	}, nil
 }
 

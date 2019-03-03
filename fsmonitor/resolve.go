@@ -6,13 +6,13 @@ import (
 )
 
 type Node struct {
-	path string
+	path     string
 	children map[string]*Node
 }
 
 func newNode(path string) *Node {
 	return &Node{
-		path: path,
+		path:     path,
 		children: make(map[string]*Node),
 	}
 }

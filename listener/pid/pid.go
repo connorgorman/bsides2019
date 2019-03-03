@@ -10,8 +10,8 @@ import (
 )
 
 type ContainerPID struct {
-	ID  string
-	PID int
+	ID      string
+	PID     int
 	Command string
 }
 

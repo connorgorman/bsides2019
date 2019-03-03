@@ -7,28 +7,28 @@ import (
 	"path/filepath"
 	"time"
 
+	demoTypes "github.com/connorgorman/bsides2019/types"
 	"github.com/docker/docker/api"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	demoTypes "github.com/connorgorman/bsides2019/types"
 )
 
 type Listener struct {
-	client              *client.Client
-	newContainerChannel chan demoTypes.Container
+	client                 *client.Client
+	newContainerChannel    chan demoTypes.Container
 	removeContainerChannel chan string
 }
 
 func NewListener() (*Listener, error) {
-	possibleDockerSockets := []string {
+	possibleDockerSockets := []string{
 		"unix:///host/var/run/docker.sock",
 		"unix:///host/run/docker.sock",
 	}
 
 	var (
 		dockerClient *client.Client
-		err error
+		err          error
 	)
 	for _, s := range possibleDockerSockets {
 		dockerClient, err = client.NewClient(s, api.DefaultVersion, nil, nil)
@@ -44,8 +44,8 @@ func NewListener() (*Listener, error) {
 		return nil, err
 	}
 	return &Listener{
-		client:              dockerClient,
-		newContainerChannel: make(chan demoTypes.Container),
+		client:                 dockerClient,
+		newContainerChannel:    make(chan demoTypes.Container),
 		removeContainerChannel: make(chan string),
 	}, nil
 }
@@ -74,11 +74,11 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 		return fmt.Errorf("could not find MergedDir for containerJSON %q", id)
 	}
 	d.newContainerChannel <- demoTypes.Container{
-		ID: containerJSON.ID,
+		ID:   containerJSON.ID,
 		Name: containerJSON.Config.Labels["io.kubernetes.container.name"],
-		Pod: containerJSON.Config.Labels["io.kubernetes.pod.name"],
+		Pod:  containerJSON.Config.Labels["io.kubernetes.pod.name"],
 
-		PID: containerJSON.State.Pid,
+		PID:      containerJSON.State.Pid,
 		FilePath: filepath.Join("/host/", path),
 	}
 	return nil
@@ -103,7 +103,7 @@ func (d *Listener) events() {
 			case "stop", "kill":
 				d.removeContainerChannel <- event.Actor.ID
 				log.Printf("KILL or STOP: %q", event.Actor.ID)
-		}
+			}
 		case err := <-errorChan:
 			log.Printf("Error: %v", err)
 		}
@@ -111,7 +111,7 @@ func (d *Listener) events() {
 }
 
 func (d *Listener) Start() {
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	containers, err := d.client.ContainerList(ctx, types.ContainerListOptions{})
 	if err != nil {

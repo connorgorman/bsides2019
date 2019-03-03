@@ -6,7 +6,7 @@ import (
 )
 
 func TestResolve(t *testing.T) {
-	filepaths := []string {
+	filepaths := []string{
 		"/a",
 		"/a/b",
 		"/a/b/c",

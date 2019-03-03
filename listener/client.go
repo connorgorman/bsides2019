@@ -3,10 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/connorgorman/bsides2019/types"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/connorgorman/bsides2019/types"
 )
 
 type client struct {
