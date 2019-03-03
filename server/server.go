@@ -53,6 +53,7 @@ func (s *server) GetRouter() http.Handler {
 	r.HandleFunc("/files", s.FilesPostHandler)
 	r.HandleFunc("/capabilities", s.CapabilitiesPostHandler)
 	r.HandleFunc("/pids", s.PIDsPostHandler)
+	r.HandleFunc("/network", s.NetworkPostHandler)
 	return r
 }
 
@@ -175,7 +176,7 @@ func (s *server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
 	s.containerToPidMap[pid.ID] = append(s.containerToPidMap[pid.ID], &pid)
 }
 
-func (s *server) NetworkHandler(w http.ResponseWriter, req *http.Request) {
+func (s *server) NetworkPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
