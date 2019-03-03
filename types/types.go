@@ -1,10 +1,9 @@
 package types
 
 type Capability struct {
-	ContainerID string
-	PID         int
-	Cap         string
-	Command     string
+	PID     int
+	Cap     string
+	Command string
 }
 
 type File struct {
@@ -16,4 +15,9 @@ type Container struct {
 	ID, Name, Pod string
 	PID           int
 	FilePath      string
+}
+
+type ContainerPID struct {
+	ID  string
+	PID int
 }

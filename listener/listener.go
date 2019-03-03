@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/connorgorman/bsides2019/listener/capable"
 	"github.com/connorgorman/bsides2019/listener/docker"
 	"github.com/connorgorman/bsides2019/listener/fsmonitor"
@@ -39,10 +37,9 @@ func main() {
 			fileListener.RemoveContainer(cid)
 
 		case cap := <-capableListener.Output():
-			log.Printf("Capability: %+v", cap)
 			go client.SendCapability(cap)
-
 		case pid := <-pidListener.Output():
+			go client.SendPID(pid)
 			capableListener.AddContainer(pid)
 		case file := <-fileListener.Output():
 			go client.SendFile(file)

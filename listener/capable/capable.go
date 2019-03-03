@@ -8,37 +8,26 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
-	"github.com/connorgorman/bsides2019/listener/pid"
 	"github.com/connorgorman/bsides2019/types"
 )
 
 type Listener struct {
-	output           chan types.Capability
-	pidsToContainers map[int]string
-	containerToCaps  map[string]map[string]struct{}
+	output    chan types.Capability
+	pidToCaps map[int]map[string]struct{}
 
 	lock sync.Mutex
 }
 
 func NewListener() *Listener {
 	return &Listener{
-		output:           make(chan types.Capability),
-		pidsToContainers: make(map[int]string),
-		containerToCaps:  make(map[string]map[string]struct{}),
+		output:    make(chan types.Capability),
+		pidToCaps: make(map[int]map[string]struct{}),
 	}
 }
 
 func (l *Listener) Output() <-chan types.Capability {
 	return l.output
-}
-
-func (l *Listener) AddContainer(c pid.ContainerPID) {
-	log.Printf("Container: %+v", c)
-	l.lock.Lock()
-	defer l.lock.Unlock()
-	l.pidsToContainers[c.PID] = c.ID
 }
 
 func (l *Listener) parseAndOutput(line string) {
@@ -56,30 +45,18 @@ func (l *Listener) parseAndOutput(line string) {
 		return
 	}
 
-	// Delay so that pid can be scraped
-	time.Sleep(50 * time.Millisecond)
-	l.lock.Lock()
-	cid, ok := l.pidsToContainers[pid]
-	l.lock.Unlock()
-	if !ok {
-		return
-	}
-
-	if _, ok := l.containerToCaps[cid]; !ok {
-		l.containerToCaps[cid] = make(map[string]struct{})
+	if _, ok := l.pidToCaps[pid]; !ok {
+		l.pidToCaps[pid] = make(map[string]struct{})
 	}
 	cap := values[6]
-	// Don't resend a capability for the same container
-	if _, ok := l.containerToCaps[cid][cap]; ok {
+	if _, ok := l.pidToCaps[pid][cap]; ok {
 		return
 	}
-	l.containerToCaps[cid][cap] = struct{}{}
-
+	l.pidToCaps[pid][cap] = struct{}{}
 	l.output <- types.Capability{
-		ContainerID: cid,
-		PID:         pid,
-		Command:     values[4],
-		Cap:         cap,
+		PID:     pid,
+		Command: values[4],
+		Cap:     cap,
 	}
 }
 

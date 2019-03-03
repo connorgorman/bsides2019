@@ -16,13 +16,10 @@ func (s *Server) GetRouter() http.Handler {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/containers", s.ContainerPostHandler)
-	r.HandleFunc("/containers/{id}", s.ContainerHandler)
-
 	r.HandleFunc("/files", s.FilesPostHandler)
-	r.HandleFunc("/files/{id}", s.FilesHandler)
-
-	r.HandleFunc("/capabilities/{id}", s.CapabilitiesHandler)
 	r.HandleFunc("/capabilities", s.CapabilitiesPostHandler)
+	r.HandleFunc("/pids", s.PIDsPostHandler)
+
 	return r
 }
 
@@ -34,20 +31,12 @@ func (s *Server) ContainerPostHandler(w http.ResponseWriter, req *http.Request) 
 	log.Println(string(data))
 }
 
-func (s *Server) ContainerHandler(w http.ResponseWriter, req *http.Request) {
-
-}
-
 func (s *Server) FilesPostHandler(w http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 	}
 	log.Println(string(data))
-}
-
-func (s *Server) FilesHandler(w http.ResponseWriter, req *http.Request) {
-
 }
 
 func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Request) {
@@ -58,8 +47,12 @@ func (s *Server) CapabilitiesPostHandler(w http.ResponseWriter, req *http.Reques
 	log.Println(string(data))
 }
 
-func (s *Server) CapabilitiesHandler(w http.ResponseWriter, req *http.Request) {
-
+func (s *Server) PIDsPostHandler(w http.ResponseWriter, req *http.Request) {
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Printf("Error reading body: %v", err)
+	}
+	log.Println(string(data))
 }
 
 func (s *Server) NetworkHandler(w http.ResponseWriter, req *http.Request) {

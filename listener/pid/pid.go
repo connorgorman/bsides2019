@@ -7,35 +7,26 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/connorgorman/bsides2019/types"
 )
 
-type ContainerPID struct {
-	ID      string
-	PID     int
-	Command string
-}
-
 type Listener struct {
-	pidChan chan ContainerPID
+	pidChan chan types.ContainerPID
 }
 
 func NewListener() *Listener {
 	return &Listener{
-		pidChan: make(chan ContainerPID),
+		pidChan: make(chan types.ContainerPID),
 	}
 }
 
-func (l *Listener) Output() <-chan ContainerPID {
+func (l *Listener) Output() <-chan types.ContainerPID {
 	return l.pidChan
 }
 
 func (l *Listener) parseCgroupAndOutput(pid int) {
 	data, err := ioutil.ReadFile(fmt.Sprintf("/host/proc/%d/cgroup", pid))
-	if err != nil {
-		return
-	}
-
-	command, err := ioutil.ReadFile(fmt.Sprintf("/host/proc/%d/cmdline", pid))
 	if err != nil {
 		return
 	}
@@ -47,7 +38,7 @@ func (l *Listener) parseCgroupAndOutput(pid int) {
 	if len(containerID) != 64 {
 		return
 	}
-	l.pidChan <- ContainerPID{ID: containerID, PID: pid, Command: string(command)}
+	l.pidChan <- types.ContainerPID{ID: containerID, PID: pid}
 }
 
 func (l *Listener) Start() {

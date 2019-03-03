@@ -43,6 +43,12 @@ func (c *client) SendCapability(capability types.Capability) {
 	}
 }
 
+func (c *client) SendPID(pid types.ContainerPID) {
+	if err := c.sendRequest("/pids", &pid); err != nil {
+		log.Printf("error sending pid: %v", err)
+	}
+}
+
 func (c *client) sendRequest(url string, i interface{}) error {
 	data, err := json.Marshal(i)
 	if err != nil {
