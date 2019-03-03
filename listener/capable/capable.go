@@ -39,6 +39,7 @@ func (l *Listener) parseAndOutput(line string) {
 	if values[7] == "0" {
 		return
 	}
+
 	pid, err := strconv.Atoi(values[2])
 	if err != nil {
 		log.Printf("could not parse pid: %q", values[2])

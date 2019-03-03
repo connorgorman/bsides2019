@@ -32,13 +32,15 @@ func (l *Listener) parseCgroupAndOutput(pid int) {
 	}
 
 	dataStr := string(data)
-	line := strings.SplitN(dataStr, "\n", 2)[0]
-	lineSplit := strings.Split(line, "/")
-	containerID := lineSplit[len(lineSplit)-1]
-	if len(containerID) != 64 {
-		return
+	cgroupLines := strings.Split(dataStr, "\n")
+	for _, line := range cgroupLines {
+		lineSplit := strings.Split(line, "/")
+		containerID := lineSplit[len(lineSplit)-1]
+		if len(containerID) == 64 {
+			l.pidChan <- types.ContainerPID{ID: containerID, PID: pid}
+			return
+		}
 	}
-	l.pidChan <- types.ContainerPID{ID: containerID, PID: pid}
 }
 
 func (l *Listener) Start() {
