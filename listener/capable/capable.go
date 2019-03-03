@@ -62,7 +62,6 @@ func (l *Listener) parseAndOutput(line string) {
 	cid, ok := l.pidsToContainers[pid]
 	l.lock.Unlock()
 	if !ok {
-		log.Printf("dropping %s -> %s", values[4], values[6])
 		return
 	}
 	l.output <- types.Capability{

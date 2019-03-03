@@ -5,6 +5,7 @@ import (
 	"github.com/connorgorman/bsides2019/listener/docker"
 	"github.com/connorgorman/bsides2019/listener/fsmonitor"
 	"github.com/connorgorman/bsides2019/listener/pid"
+	"log"
 )
 
 func main() {
@@ -37,6 +38,7 @@ func main() {
 			fileListener.RemoveContainer(cid)
 
 		case cap := <-capableListener.Output():
+			log.Printf("Capability: %+v", cap)
 			client.SendCapability(cap)
 
 		case pid := <-pidListener.Output():
