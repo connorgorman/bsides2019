@@ -15,6 +15,7 @@ type Container struct {
 	ID, Name, Pod string
 	PID           int
 	FilePath      string
+	ReadonlyFS    bool
 }
 
 type ContainerPID struct {

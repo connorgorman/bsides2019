@@ -33,6 +33,7 @@ func newServer() *server {
 type FileResponse struct {
 	PotentialFSRoots []string
 	ReadOnlyPossible bool
+	IsReadOnly       bool
 }
 
 type ContainerResponse struct {
@@ -71,6 +72,7 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 			File: FileResponse{
 				PotentialFSRoots: roots,
 				ReadOnlyPossible: possible,
+				IsReadOnly:       container.ReadonlyFS,
 			},
 		})
 	}
