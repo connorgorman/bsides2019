@@ -32,15 +32,12 @@ func main() {
 		case container := <-dockerListener.NewContainerChannel():
 			fileListener.AddContainer(&container)
 			go client.SendContainer(container)
-
 		case cid := <-dockerListener.RemoveContainerChannel():
 			fileListener.RemoveContainer(cid)
-
 		case cap := <-capableListener.Output():
 			go client.SendCapability(cap)
 		case pid := <-pidListener.Output():
 			go client.SendPID(pid)
-			capableListener.AddContainer(pid)
 		case file := <-fileListener.Output():
 			go client.SendFile(file)
 		}
