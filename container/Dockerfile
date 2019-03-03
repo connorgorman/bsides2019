@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y gnupg ca-certificates && \
 
 RUN apt-get update && apt-get install -y bcc-tools libbcc-examples linux-headers-4.15.0-1026-gcp
 
+RUN apt-get install -y inetutils-ping curl
+
 COPY ./bin/ /
 
 COPY ./scripts/ /

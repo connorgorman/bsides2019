@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: capped-ubuntu
+  labels:
+    app: capped-ubuntu
+spec:
+  replicas: 1
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      app: capped-ubuntu
+  template:
+    metadata:
+      labels:
+        app: capped-ubuntu
+    spec:
+      containers:
+      - image: connorgorman/bsides2019:latest
+        imagePullPolicy: Always
+        name: capped-ubuntu
+        command: ["sleep", "10000"]
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_RAW
