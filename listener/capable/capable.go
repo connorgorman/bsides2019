@@ -61,11 +61,8 @@ func (l *Listener) parseAndOutput(line string) {
 	cid, ok := l.pidsToContainers[pid]
 	l.lock.Unlock()
 	if !ok {
+		log.Printf("dropping %s -> %s", values[4], values[6])
 		return
-	}
-
-	if _, ok := l.containerToCaps[cid]; !ok {
-		l.containerToCaps[cid] = make(map[string]struct{})
 	}
 	l.output <- types.Capability{
 		ContainerID: cid,
