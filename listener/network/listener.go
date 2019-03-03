@@ -16,7 +16,7 @@ import (
 type Listener struct {
 	output chan types.Network
 
-	networkCalls map[networkKey]struct{}
+	networkCalls map[types.Network]struct{}
 
 	lock sync.Mutex
 }
@@ -25,26 +25,12 @@ func NewListener() *Listener {
 	return &Listener{
 		output: make(chan types.Network),
 
-		networkCalls: make(map[networkKey]struct{}),
+		networkCalls: make(map[types.Network]struct{}),
 	}
 }
 
 func (l *Listener) Output() <-chan types.Network {
 	return l.output
-}
-
-type networkKey struct {
-	Command, SAddr, DAddr string
-	DPort                 int
-}
-
-func networkKeyFromNetwork(n types.Network) networkKey {
-	return networkKey{
-		Command: n.Command,
-		SAddr:   n.SAddr,
-		DAddr:   n.DAddr,
-		DPort:   n.DPort,
-	}
 }
 
 func (l *Listener) parseAndOutput(line string, call string) {
@@ -74,13 +60,12 @@ func (l *Listener) parseAndOutput(line string, call string) {
 		Call:    call,
 	}
 
-	mapKey := networkKeyFromNetwork(nc)
 	l.lock.Lock()
-	if _, ok := l.networkCalls[mapKey]; ok {
+	if _, ok := l.networkCalls[nc]; ok {
 		l.lock.Unlock()
 		return
 	}
-	l.networkCalls[mapKey] = struct{}{}
+	l.networkCalls[nc] = struct{}{}
 	l.lock.Unlock()
 
 	l.output <- nc
@@ -120,5 +105,5 @@ func (l *Listener) start(process, call string) {
 
 func (l *Listener) Start() {
 	go l.start("tcpconnect", "connect")
-	go l.start("tcpconnect", "accept")
+	go l.start("tcpaccept", "accept")
 }

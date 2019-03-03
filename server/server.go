@@ -95,6 +95,7 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 				capabilities = append(capabilities, c)
 			}
 
+			log.Printf("%s -> %d", container.Name, p.PID)
 			network = append(network, s.pidsToNetwork[p.PID]...)
 		}
 
@@ -202,6 +203,7 @@ func (s *server) NetworkPostHandler(w http.ResponseWriter, req *http.Request) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.pidsToNetwork[network.PID] = append(s.pidsToNetwork[network.PID], &network)
+	log.Printf("Network Call: %+v", &network)
 }
 
 func main() {
