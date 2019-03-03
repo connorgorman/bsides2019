@@ -17,7 +17,7 @@ import (
 type Listener struct {
 	output           chan types.Capability
 	pidsToContainers map[int]string
-	pidToCaps        map[int]map[string]struct{}
+	containerToCaps  map[string]map[string]struct{}
 
 	lock sync.Mutex
 }
@@ -26,7 +26,7 @@ func NewListener() *Listener {
 	return &Listener{
 		output:           make(chan types.Capability),
 		pidsToContainers: make(map[int]string),
-		pidToCaps:        make(map[int]map[string]struct{}),
+		containerToCaps:  make(map[string]map[string]struct{}),
 	}
 }
 
@@ -65,15 +65,15 @@ func (l *Listener) parseAndOutput(line string) {
 		return
 	}
 
-	if _, ok := l.pidToCaps[pid]; !ok {
-		l.pidToCaps[pid] = make(map[string]struct{})
+	if _, ok := l.containerToCaps[cid]; !ok {
+		l.containerToCaps[cid] = make(map[string]struct{})
 	}
 	cap := values[6]
 	// Don't resend a capability for the same container
-	if _, ok := l.pidToCaps[pid][cap]; ok {
+	if _, ok := l.containerToCaps[cid][cap]; ok {
 		return
 	}
-	l.pidToCaps[pid][cap] = struct{}{}
+	l.containerToCaps[cid][cap] = struct{}{}
 
 	l.output <- types.Capability{
 		ContainerID: cid,
