@@ -105,7 +105,6 @@ func (s *server) ContainerGetHandler(w http.ResponseWriter, req *http.Request) {
 			File: FileResponse{
 				PotentialFSRoots: roots,
 				ReadOnlyPossible: possible,
-				IsReadOnly:       container.ReadonlyFS,
 			},
 			Network: network,
 		})
