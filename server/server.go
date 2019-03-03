@@ -32,15 +32,15 @@ func newServer() *server {
 }
 
 type FileResponse struct {
-	PotentialFSRoots []string
-	ReadOnlyPossible bool
-	IsReadOnly       bool
+	PotentialFSRoots []string `json:",omitempty"`
+	ReadOnlyPossible bool     `json:",omitempty"`
+	IsReadOnly       bool     `json:",omitempty"`
 }
 
 type ContainerResponse struct {
-	Container            *types.Container
-	CapabilitiesRequired []*types.Capability
-	File                 FileResponse
+	Container            *types.Container    `json:",omitempty"`
+	CapabilitiesRequired []*types.Capability `json:",omitempty"`
+	File                 FileResponse        `json:",omitempty"`
 }
 
 func (s *server) GetRouter() http.Handler {
