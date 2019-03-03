@@ -73,6 +73,11 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 	if !ok {
 		return fmt.Errorf("could not find MergedDir for containerJSON %q", id)
 	}
+
+	if containerJSON.HostConfig != nil && containerJSON.HostConfig.ReadonlyRootfs {
+		return nil
+	}
+
 	d.newContainerChannel <- demoTypes.Container{
 		ID:   containerJSON.ID,
 		Name: containerJSON.Config.Labels["io.kubernetes.container.name"],
