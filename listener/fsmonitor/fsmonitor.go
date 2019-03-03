@@ -156,6 +156,7 @@ func (c *Listener) watchFiles() {
 					log.Printf("Couldn't find container for merged path %q", mergedPath)
 					continue
 				}
+				log.Printf("caught create of %s -> subdirs %s", event.Name, getSubDirs(event.Name))
 				c.AddToWatcher(container, getSubDirs(event.Name)...)
 			case event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Chmod == fsnotify.Chmod:
 				mergedPath, relativePath := getPathsFromFullMergedPath(event.Name)
