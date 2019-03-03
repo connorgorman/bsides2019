@@ -37,7 +37,6 @@ func newServer() *server {
 type FileResponse struct {
 	PotentialFSRoots []string `json:",omitempty"`
 	ReadOnlyPossible bool
-	IsReadOnly       bool
 }
 
 type ContainerResponse struct {
@@ -203,7 +202,6 @@ func (s *server) NetworkPostHandler(w http.ResponseWriter, req *http.Request) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.pidsToNetwork[network.PID] = append(s.pidsToNetwork[network.PID], &network)
-	log.Printf("Network Call: %+v", &network)
 }
 
 func main() {

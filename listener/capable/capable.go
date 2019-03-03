@@ -35,11 +35,6 @@ func (l *Listener) parseAndOutput(line string) {
 	if len(values) < 8 {
 		return
 	}
-	// if audit == 0, then ignore
-	if values[7] == "0" {
-		return
-	}
-
 	pid, err := strconv.Atoi(values[2])
 	if err != nil {
 		log.Printf("could not parse pid: %q", values[2])
@@ -53,11 +48,18 @@ func (l *Listener) parseAndOutput(line string) {
 	if _, ok := l.pidToCaps[pid][cap]; ok {
 		return
 	}
+
+	cmd := values[4]
+	if strings.HasPrefix("runc", cmd) {
+		return
+	}
+
 	l.pidToCaps[pid][cap] = struct{}{}
 	l.output <- types.Capability{
 		PID:     pid,
-		Command: values[4],
+		Command: cmd,
 		Cap:     cap,
+		Audit: values[7],
 	}
 }
 

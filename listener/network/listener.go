@@ -51,11 +51,18 @@ func (l *Listener) parseAndOutput(line string, call string) {
 		return
 	}
 
+	src := strings.TrimPrefix(values[3], "::ffff:")
+	dst := strings.TrimPrefix(values[4], "::ffff:")
+	if src == "127.0.0.1" || dst == "127.0.0.1" {
+		return
+	}
+
+
 	nc := types.Network{
 		PID:     pid,
 		Command: values[1],
-		SAddr:   values[3],
-		DAddr:   values[4],
+		SAddr:   src,
+		DAddr:   dst,
 		DPort:   port,
 		Call:    call,
 	}

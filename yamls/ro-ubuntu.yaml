@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: readonly-ubuntu
+  labels:
+    app: readonly-ubuntu
+spec:
+  replicas: 1
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      app: readonly-ubuntu
+  template:
+    metadata:
+      labels:
+        app: readonly-ubuntu
+    spec:
+      containers:
+      - image: connorgorman/bsides2019:latest
+        imagePullPolicy: Always
+        name: readonly-ubuntu
+        command: ["sleep", "10000"]
+        volumeMounts:
+          - mountPath: /var/cache
+            name: var-cache
+          - mountPath: /var/log
+            name: var-log
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /etc
+            name: etc
+        securityContext:
+          readOnlyRootFilesystem: true
+      volumes:
+        - name: var-cache
+          emptyDir: {}
+        - name: var-log
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: etc
+          emptyDir: {}

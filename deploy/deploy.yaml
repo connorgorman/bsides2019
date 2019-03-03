@@ -20,7 +20,7 @@ spec:
       containers:
       - image: connorgorman/bsides2019:latest
         imagePullPolicy: Always
-        name: sensor
+        name: server
         command:
           - /server
 ---

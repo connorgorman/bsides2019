@@ -4,6 +4,7 @@ type Capability struct {
 	PID     int
 	Cap     string
 	Command string
+	Audit string
 }
 
 type File struct {
