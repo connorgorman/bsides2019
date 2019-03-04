@@ -1,0 +1,2 @@
+kubectl -f deny-egress-networkpolicy.yaml
+kubectl -n api get po

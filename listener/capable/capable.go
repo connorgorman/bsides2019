@@ -39,6 +39,8 @@ var capFilter = map[string]struct{}{
 var commandFilter = map[string]struct{}{
 	"ipset":    {},
 	"iptables": {},
+	"iptables-save": {},
+	"iptables-restor": {},
 }
 
 func (l *Listener) parseAndOutput(line string) {
