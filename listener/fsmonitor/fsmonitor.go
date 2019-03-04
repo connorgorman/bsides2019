@@ -13,7 +13,6 @@ import (
 var pathsToIgnore = map[string]struct{}{
 	"proc":  {},
 	"dev":   {},
-	"usr":   {},
 	"boot":  {},
 	"lib":   {},
 	"lib64": {},
@@ -94,7 +93,6 @@ func (c *Listener) AddContainer(container *types.Container) {
 		}
 		fullpaths = append(fullpaths, getSubFiles(filepath.Join(wrap.FilePath, d.Name()))...)
 	}
-
 	c.AddToWatcher(wrap, fullpaths...)
 }
 

@@ -96,7 +96,7 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 func (d *Listener) events() {
 	eventFilters := filters.NewArgs()
 	eventFilters.Add("type", "container")
-	eventFilters.Add("event", "create")
+	eventFilters.Add("event", "start")
 	eventFilters.Add("event", "stop")
 	eventFilters.Add("event", "kill")
 
@@ -105,7 +105,7 @@ func (d *Listener) events() {
 		select {
 		case event := <-eventChan:
 			switch event.Action {
-			case "create":
+			case "start":
 				if err := d.inspectContainerAndPush(event.Actor.ID); err != nil {
 					log.Printf("error handling container id %q", event.Actor.ID)
 				}
