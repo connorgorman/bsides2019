@@ -96,7 +96,7 @@ func (d *Listener) inspectContainerAndPush(id string) error {
 func (d *Listener) events() {
 	eventFilters := filters.NewArgs()
 	eventFilters.Add("type", "container")
-	eventFilters.Add("event", "start")
+	eventFilters.Add("event", "create")
 	eventFilters.Add("event", "stop")
 	eventFilters.Add("event", "kill")
 
