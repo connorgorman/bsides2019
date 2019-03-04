@@ -107,6 +107,8 @@ func (d *Listener) events() {
 		case event := <-eventChan:
 			switch event.Action {
 			case "start":
+				// TODO(connorgorman) This is an ugly hack for now until we look at the how the merged paths are linked
+				// Or look at bpf based collection
 				os.Exit(0)
 			case "stop", "kill":
 				d.removeContainerChannel <- event.Actor.ID
