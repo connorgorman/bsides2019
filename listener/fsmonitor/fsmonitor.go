@@ -174,6 +174,7 @@ func (c *Listener) watchFiles() {
 				if _, ok := container.modifiedPaths[relativePath]; ok {
 					continue
 				}
+				log.Printf("Modification: %+v", relativePath)
 				container.modifiedPaths[relativePath] = struct{}{}
 				c.output <- types.File{
 					ContainerID: container.ID,
