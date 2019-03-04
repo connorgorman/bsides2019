@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -106,9 +107,7 @@ func (d *Listener) events() {
 		case event := <-eventChan:
 			switch event.Action {
 			case "start":
-				if err := d.inspectContainerAndPush(event.Actor.ID); err != nil {
-					log.Printf("error handling container id %q", event.Actor.ID)
-				}
+				os.Exit(0)
 			case "stop", "kill":
 				d.removeContainerChannel <- event.Actor.ID
 				log.Printf("KILL or STOP: %q", event.Actor.ID)

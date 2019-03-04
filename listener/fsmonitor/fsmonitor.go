@@ -1,13 +1,12 @@
 package fsmonitor
 
 import (
+	"github.com/connorgorman/bsides2019/types"
+	"github.com/fsnotify/fsnotify"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-
-	"github.com/connorgorman/bsides2019/types"
-	"github.com/fsnotify/fsnotify"
 )
 
 var pathsToIgnore = map[string]struct{}{
