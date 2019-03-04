@@ -143,6 +143,7 @@ func (c *Listener) watchFiles() {
 		select {
 		case event, ok := <-c.watcher.Events:
 			if !ok {
+				log.Printf("events has returned")
 				return
 			}
 			switch {
@@ -157,6 +158,7 @@ func (c *Listener) watchFiles() {
 				c.AddToWatcher(container, getSubFiles(event.Name)...)
 				fallthrough
 			case event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Chmod == fsnotify.Chmod:
+				log.Printf("Write: %v", event.Name)
 				mergedPath, relativePath := getPathsFromFullMergedPath(event.Name)
 				container, ok := c.mergedPathToContainer[mergedPath]
 				if !ok {
@@ -164,16 +166,20 @@ func (c *Listener) watchFiles() {
 					continue
 				}
 				if _, ok := container.modifiedPaths[relativePath]; ok {
+					log.Printf("deduped path: %+v", event.Name)
 					continue
 				}
 				container.modifiedPaths[relativePath] = struct{}{}
+				log.Printf("Pushing to chan")
 				c.output <- types.File{
 					ContainerID: container.ID,
 					Path:        relativePath,
 				}
+				log.Printf("Finished pushing")
 			}
 		case err, ok := <-c.watcher.Errors:
 			if !ok {
+				log.Printf("errors has returned")
 				return
 			}
 			log.Println("error:", err)
