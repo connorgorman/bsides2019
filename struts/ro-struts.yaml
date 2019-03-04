@@ -22,7 +22,7 @@ spec:
        tier: web
     spec:
       containers:
-      - image: connorg/struts:0.0.1
+      - image: connorg/struts:0.0.1-ro
         name: api
         ports:
         - containerPort: 8080

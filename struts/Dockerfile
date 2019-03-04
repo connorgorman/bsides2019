@@ -1,0 +1,5 @@
+FROM piesecurity/apache-struts2-cve-2017-5638@sha256:381a90208031e7910555c99e7a88183389f5d159dcd118c2b98fd8ce196ab79e
+
+RUN apt-get update && \
+    apt-get install -y psmisc && \
+    rm -rf /var/lib/apt
