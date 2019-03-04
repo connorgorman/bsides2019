@@ -123,9 +123,6 @@ func getSubFiles(path string) []string {
 	}
 	dirs := []string{path}
 	for _, f := range files {
-		if _, ok := pathsToIgnore[f.Name()]; ok {
-			continue
-		}
 		dirs = append(dirs, getSubFiles(filepath.Join(path, f.Name()))...)
 	}
 	return dirs
