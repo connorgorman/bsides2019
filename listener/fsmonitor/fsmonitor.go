@@ -3,6 +3,7 @@ package fsmonitor
 import (
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/connorgorman/bsides2019/types"
@@ -85,6 +86,7 @@ func (c *Listener) AddContainer(container *types.Container) {
 		log.Printf("Error: %v", err)
 		return
 	}
+
 	fullpaths := []string{wrap.FilePath}
 	for _, d := range dirs {
 		if _, ok := pathsToIgnore[d.Name()]; ok {
@@ -92,6 +94,7 @@ func (c *Listener) AddContainer(container *types.Container) {
 		}
 		fullpaths = append(fullpaths, getSubFiles(filepath.Join(wrap.FilePath, d.Name()))...)
 	}
+
 	c.AddToWatcher(wrap, fullpaths...)
 }
 
@@ -106,6 +109,14 @@ func (c *Listener) AddToWatcher(container *containerWrapper, files ...string) {
 }
 
 func getSubFiles(path string) []string {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil
+	}
+	if !fi.IsDir() {
+		return nil
+	}
+
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil
@@ -154,11 +165,9 @@ func (c *Listener) watchFiles() {
 					log.Printf("Couldn't find container for merged path %q", mergedPath)
 					continue
 				}
-				log.Printf("caught create of %s -> subdirs %s", event.Name, getSubFiles(event.Name))
 				c.AddToWatcher(container, getSubFiles(event.Name)...)
 				fallthrough
 			case event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Chmod == fsnotify.Chmod:
-				log.Printf("Write: %v", event.Name)
 				mergedPath, relativePath := getPathsFromFullMergedPath(event.Name)
 				container, ok := c.mergedPathToContainer[mergedPath]
 				if !ok {
@@ -166,16 +175,13 @@ func (c *Listener) watchFiles() {
 					continue
 				}
 				if _, ok := container.modifiedPaths[relativePath]; ok {
-					log.Printf("deduped path: %+v", event.Name)
 					continue
 				}
 				container.modifiedPaths[relativePath] = struct{}{}
-				log.Printf("Pushing to chan")
 				c.output <- types.File{
 					ContainerID: container.ID,
 					Path:        relativePath,
 				}
-				log.Printf("Finished pushing")
 			}
 		case err, ok := <-c.watcher.Errors:
 			if !ok {
