@@ -11,5 +11,4 @@ sleep 10
 kb create -f ../deploy/listener.yaml
 
 sleep 20
-kubectl -n bsides port-forward $(kb get po | grep server | awk '{print $1}') 8080:8080
-
+kubectl -n bsides port-forward $(kb get po | grep server | awk '{print $1}') 8081:8080

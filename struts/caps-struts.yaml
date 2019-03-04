@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: api
+  labels:
+    app: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app: api-server
+  template:
+    metadata:
+     labels:
+       app: api-server
+       tier: web
+    spec:
+      containers:
+      - image: connorg/struts:0.0.1-ro
+        name: api
+        ports:
+        - containerPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+              - all
+      terminationGracePeriodSeconds: 0

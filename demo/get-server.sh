@@ -1,3 +1,3 @@
 #! /bin/bash
 
-curl -sk http://localhost:8080/containers/server | jq .
+curl -sk http://localhost:8081/containers/server | jq .
