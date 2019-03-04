@@ -28,10 +28,4 @@ spec:
         - containerPort: 8080
         securityContext:
           readOnlyRootFilesystem: true
-      #   volumeMounts:
-      #   - name: tmp
-      #     mountPath: /usr/local/tomcat
-      # volumes:
-      # - name: tmp
-      #   emptyDir: {}
       terminationGracePeriodSeconds: 0
