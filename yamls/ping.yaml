@@ -1,24 +1,24 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: pinger
+  name: ping
   labels:
-    app: pinger
+    app: ping
 spec:
   replicas: 1
   minReadySeconds: 15
   selector:
     matchLabels:
-      app: pinger
+      app: ping
   template:
     metadata:
       labels:
-        app: pinger
+        app: ping
     spec:
       containers:
       - image: connorgorman/bsides2019:latest
         imagePullPolicy: Always
-        name: pinger
+        name: ping
         command: ["ping", "google.com"]
         securityContext:
           capabilities:

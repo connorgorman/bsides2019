@@ -90,7 +90,7 @@ func (c *Listener) AddContainer(container *types.Container) {
 		if _, ok := pathsToIgnore[d.Name()]; ok {
 			continue
 		}
-		fullpaths = append(fullpaths, getSubDirs(filepath.Join(wrap.FilePath, d.Name()))...)
+		fullpaths = append(fullpaths, getSubFiles(filepath.Join(wrap.FilePath, d.Name()))...)
 	}
 	c.AddToWatcher(wrap, fullpaths...)
 }
@@ -105,20 +105,17 @@ func (c *Listener) AddToWatcher(container *containerWrapper, files ...string) {
 	}
 }
 
-func getSubDirs(path string) []string {
+func getSubFiles(path string) []string {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil
 	}
 	dirs := []string{path}
 	for _, f := range files {
-		if !f.IsDir() {
-			continue
-		}
 		if _, ok := pathsToIgnore[f.Name()]; ok {
 			continue
 		}
-		dirs = append(dirs, getSubDirs(filepath.Join(path, f.Name()))...)
+		dirs = append(dirs, getSubFiles(filepath.Join(path, f.Name()))...)
 	}
 	return dirs
 }
@@ -156,8 +153,9 @@ func (c *Listener) watchFiles() {
 					log.Printf("Couldn't find container for merged path %q", mergedPath)
 					continue
 				}
-				log.Printf("caught create of %s -> subdirs %s", event.Name, getSubDirs(event.Name))
-				c.AddToWatcher(container, getSubDirs(event.Name)...)
+				log.Printf("caught create of %s -> subdirs %s", event.Name, getSubFiles(event.Name))
+				c.AddToWatcher(container, getSubFiles(event.Name)...)
+				fallthrough
 			case event.Op&fsnotify.Write == fsnotify.Write || event.Op&fsnotify.Chmod == fsnotify.Chmod:
 				mergedPath, relativePath := getPathsFromFullMergedPath(event.Name)
 				container, ok := c.mergedPathToContainer[mergedPath]

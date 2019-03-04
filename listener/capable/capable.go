@@ -30,14 +30,14 @@ func (l *Listener) Output() <-chan types.Capability {
 	return l.output
 }
 
-var capFilter = map[string]struct{} {
+var capFilter = map[string]struct{}{
 	"CAP_SYS_ADMIN": {},
-	"CAP_SETUID": {},
+	"CAP_SETUID":    {},
 }
 
 // These commands are consistent with container creation
-var commandFilter = map[string]struct{} {
-	"ipset": {},
+var commandFilter = map[string]struct{}{
+	"ipset":    {},
 	"iptables": {},
 }
 
@@ -76,7 +76,7 @@ func (l *Listener) parseAndOutput(line string) {
 		PID:     pid,
 		Command: cmd,
 		Cap:     cap,
-		Audit: values[7],
+		Audit:   values[7],
 	}
 }
 

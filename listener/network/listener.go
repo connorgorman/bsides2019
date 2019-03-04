@@ -57,7 +57,6 @@ func (l *Listener) parseAndOutput(line string, call string) {
 		return
 	}
 
-
 	nc := types.Network{
 		PID:     pid,
 		Command: values[1],

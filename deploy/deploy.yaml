@@ -37,36 +37,3 @@ spec:
   selector:
     app: server
   type: ClusterIP
----
-apiVersion: extensions/v1beta1
-kind: DaemonSet
-metadata:
-  labels:
-    app: listener
-  name: listener
-  namespace: bsides
-spec:
-  selector:
-    matchLabels:
-      app: listener
-  template:
-    metadata:
-      labels:
-        app: listener
-      namespace: bsides
-    spec:
-      containers:
-      - name: listener
-        securityContext:
-          privileged: true
-        imagePullPolicy: Always
-        image: connorgorman/bsides2019:latest
-        command:
-          - /listener
-        volumeMounts:
-        - mountPath: /host
-          name: hostroot
-      volumes:
-      - hostPath:
-          path: /
-        name: hostroot
